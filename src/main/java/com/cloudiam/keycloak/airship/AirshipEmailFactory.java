@@ -1,4 +1,4 @@
-package com.keycloak.airship;
+package com.cloudiam.keycloak.airship;
 
 import org.keycloak.Config;
 import org.keycloak.email.EmailSenderProvider;

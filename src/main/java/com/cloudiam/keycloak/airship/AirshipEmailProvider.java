@@ -1,12 +1,10 @@
-package com.keycloak.airship;
+package com.cloudiam.keycloak.airship;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.http.HttpClient;

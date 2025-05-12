@@ -1,4 +1,4 @@
-package com.keycloak.airship;
+package com.cloudiam.keycloak.airship;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,12 +69,12 @@ class AirshipEmailProviderTest {
         String textBody = "Test text body";
         String htmlBody = "<p>Test HTML body</p>";
         Map<String, String> config = new HashMap<>();
-        
+
         provider.send(config, recipient, subject, textBody, htmlBody);
-        
+
         verify(mockHttpClient).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
     }
-    
+
     @Test
     void shouldUseCustomSenderWhenProvided() throws Exception {
         String recipient = "recipient@example.com";
@@ -84,9 +84,9 @@ class AirshipEmailProviderTest {
         String customSender = "custom@sender.com";
         Map<String, String> config = new HashMap<>();
         config.put("from", customSender);
-        
+
         provider.send(config, recipient, subject, textBody, htmlBody);
-        
+
         verify(mockHttpClient).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
     }
 
@@ -108,7 +108,7 @@ class AirshipEmailProviderTest {
         assertTrue(exception.getMessage().startsWith(expectedErrorPrefix),
                 "Exception message should start with '" + expectedErrorPrefix + "', but was: " + exception.getMessage());
     }
-    
+
     @Test
     void shouldThrowExceptionOnHttpClientError() throws Exception {
         String recipient = "recipient@example.com";
@@ -136,7 +136,7 @@ class AirshipEmailProviderTest {
     @Test
     void shouldDiscoverProviderThroughServiceLoader() throws Exception {
         ServiceLoader<EmailSenderProviderFactory> loader = ServiceLoader.load(EmailSenderProviderFactory.class);
-        
+
         boolean found = false;
         for (EmailSenderProviderFactory factory : loader) {
             if (factory instanceof AirshipEmailFactory) {
@@ -144,7 +144,7 @@ class AirshipEmailProviderTest {
                 break;
             }
         }
-        
+
         assertTrue(found, "AirshipEmailFactory should be discovered by ServiceLoader");
     }
 }
