@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -13,6 +16,7 @@ import java.util.Map;
 
 public class AirshipEmailProvider implements EmailSenderProvider {
 
+    private Logger logger = LoggerFactory.getLogger(AirshipEmailProvider.class);
     private final String apiUrl;
     private final String airShipDomain;
     private final String accessToken;
@@ -64,9 +68,11 @@ public class AirshipEmailProvider implements EmailSenderProvider {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() >= 400) {
+                logger.error("Failed to send email. Response code: {}, body: {}", response.statusCode(), json);
                 throw new EmailException("Airship API responded with error: " + response.statusCode() + " - " + response.body());
             }
 
+            logger.info("Airship Email sent successfully.");
         } catch (Exception e) {
             throw new EmailException("Failed to send email via Airship", e);
         }

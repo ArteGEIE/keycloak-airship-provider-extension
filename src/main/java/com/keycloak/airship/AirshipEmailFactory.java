@@ -6,9 +6,12 @@ import org.keycloak.email.EmailSenderProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
+import java.util.logging.Logger;
+
 public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
     public static final String PROVIDER_ID = "keycloak-airship-provider";
+    private Logger logger = Logger.getLogger(AirshipEmailFactory.class.getName());
     private String apiUrl;
     private String airShipDomain;
     private String accessToken;
@@ -28,6 +31,8 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
         if (apiUrl == null || accessToken == null || appKey == null || defaultSender == null || airshipHeader == null || airShipDomain == null) {
             throw new IllegalStateException("Missing required Airship environment variables.");
         }
+
+        logger.info("Airship Email Factory initialized successfully.");
     }
 
     @Override
