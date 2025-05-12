@@ -3,6 +3,10 @@
 *.iws
 *.iml
 *.ipr
+.mvn
 
 target
 !.mvn/wrapper/maven-wrapper.jar
+
+keycloak-airship-provider-extension
+.env
