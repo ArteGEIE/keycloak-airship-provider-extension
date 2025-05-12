@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
-    public static final String PROVIDER_ID = "keycloak-airship-provider";
+    public static final String PROVIDER_ID = "default";
     private final Logger logger = LoggerFactory.getLogger(AirshipEmailFactory.class);
     private String apiEndpoint;
     private String airShipDomain;

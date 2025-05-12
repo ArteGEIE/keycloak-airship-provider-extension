@@ -41,6 +41,8 @@ public class AirshipEmailProvider implements EmailSenderProvider {
     @Override
     public void send(Map<String, String> config, String address, String subject, String textBody, String htmlBody) throws EmailException {
         try {
+            logger.info("******** START AIRSHIP EMAIL SENDING ********");
+
             // Create the payload according to Airship API format
             ObjectNode payload = objectMapper.createObjectNode();
             ObjectNode audience = objectMapper.createObjectNode();
@@ -126,7 +128,7 @@ public class AirshipEmailProvider implements EmailSenderProvider {
                 throw new EmailException("Airship API responded with error: " + response.statusCode() + " - " + response.body());
             }
 
-            logger.info("Airship Email sent successfully to {}. Status code: {}", address, response.statusCode());
+            logger.info("******** AIRSHIP EMAIL SENT SUCCESSFULLY to {}. ********", address);
         } catch (Exception e) {
             logger.error("Failed to send email via Airship", e);
             throw new EmailException("Failed to send email via Airship", e);
