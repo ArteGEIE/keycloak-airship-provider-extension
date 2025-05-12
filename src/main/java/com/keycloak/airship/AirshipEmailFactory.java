@@ -9,14 +9,30 @@ import org.keycloak.models.KeycloakSessionFactory;
 public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
     public static final String PROVIDER_ID = "keycloak-airship-provider";
+    private String apiUrl;
+    private String airShipDomain;
+    private String accessToken;
+    private String appKey;
+    private String defaultSender;
+    private String airshipHeader;
 
     @Override
-    public EmailSenderProvider create(KeycloakSession session) {
-        return new AirshipEmailProvider(session);
+    public void init(Config.Scope config) {
+        this.apiUrl = System.getenv("AIRSHIP_API_URL");
+        this.airShipDomain = System.getenv("AIRSHIP_DOMAIN");
+        this.accessToken = System.getenv("AIRSHIP_ACCESS_TOKEN");
+        this.appKey = System.getenv("AIRSHIP_APP_KEY");
+        this.defaultSender = System.getenv("AIRSHIP_EMAIL_SENDER");
+        this.airshipHeader = System.getenv("AIRSHIP_HEADER");
+
+        if (apiUrl == null || accessToken == null || appKey == null || defaultSender == null || airshipHeader == null || airShipDomain == null) {
+            throw new IllegalStateException("Missing required Airship environment variables.");
+        }
     }
 
     @Override
-    public void init(Config.Scope scope) {
+    public EmailSenderProvider create(KeycloakSession session) {
+        return new AirshipEmailProvider(apiUrl, airShipDomain, accessToken, appKey, defaultSender, airshipHeader);
     }
 
     @Override

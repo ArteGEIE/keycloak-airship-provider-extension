@@ -11,8 +11,17 @@ services:
       KC_FEATURES: preview,scripts
       KC_LOG_FORMAT: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"
       KC_LOG_LEVEL: "INFO,org.hibernate:INFO,com.cloudiam:DEBUG,org.keycloak.authentication:DEBUG"
-      KC_SPI_PHONE_CIAM_DEFAULT_PHONE_PROVIDER_PHONE_DEFAULT_REGION: "FR"
-      KC_SPI_PHONE_CIAM_DEFAULT_PHONE_PROVIDER_CANONICALIZE_PHONE_NUMBERS: "E164"
+      SMTP_HOST: "smtp"
+      SMTP_PORT: "1025"
+
+      # Airship and email configuration
+      AIRSHIP_SENDER_EMAIL: "arte-trials@test.fr"
+      AIRSHIP_ENDPOINT_URL: "/api/create-and-send"
+      AIRSHIP_APP_KEY: ""  # Add your Airship API key here
+      AIRSHIP_ACCESS_TOKEN: ""  # Add your Airship access token here
+      AIRSHIP_HEADER: "vnd.urbanairship+json"
+      AIRSHIP_DOMAIN: "https://go.airship.eu"
+
     command:
       - "start-dev"
     ports:
