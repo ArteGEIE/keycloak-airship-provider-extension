@@ -38,8 +38,8 @@ class AirshipEmailProviderTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        String TEST_API_URL = "/api/test";
-        String TEST_AIRSHIP_DOMAIN = "test-airship-domain.com";
+        String TEST_API_URL = "https://test-airship-domain.com/api/test"; // Add scheme
+        String TEST_AIRSHIP_DOMAIN = "https://test-airship-domain.com";  // Add scheme
         String TEST_APP_KEY = "test-app-key";
         String TEST_AIRSHIP_HEADER = "vnd.urbanairship+json";
         String TEST_DEFAULT_SENDER = "test@sender.com";
@@ -52,11 +52,11 @@ class AirshipEmailProviderTest {
                 TEST_DEFAULT_SENDER,
                 TEST_AIRSHIP_HEADER
         );
-        
+
         Field httpClientField = AirshipEmailProvider.class.getDeclaredField("httpClient");
         httpClientField.setAccessible(true);
         httpClientField.set(provider, mockHttpClient);
-        
+
         lenient().when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(mockResponse);
         lenient().when(mockResponse.statusCode()).thenReturn(200);
         lenient().when(mockResponse.body()).thenReturn("{\"ok\": true}");
@@ -89,24 +89,23 @@ class AirshipEmailProviderTest {
         
         verify(mockHttpClient).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
     }
-    
+
     @Test
     void shouldThrowExceptionOnApiError() throws Exception {
-        // Given
         String recipient = "recipient@example.com";
         String subject = "Test Subject";
         String textBody = "Test text body";
         String htmlBody = "<p>Test HTML body</p>";
         Map<String, String> config = new HashMap<>();
-        
-        when(mockResponse.statusCode()).thenReturn(400);
-        when(mockResponse.body()).thenReturn("{\"error\": \"Bad Request\"}");
 
-        EmailException exception = assertThrows(EmailException.class, 
+        lenient().when(mockResponse.statusCode()).thenReturn(400); // Mark as lenient
+        lenient().when(mockResponse.body()).thenReturn("{\"error\": \"Bad Request\"}"); // Mark as lenient
+
+        EmailException exception = assertThrows(EmailException.class,
                 () -> provider.send(config, recipient, subject, textBody, htmlBody));
-        
+
         String expectedErrorPrefix = "Failed to send email via Airship";
-        assertTrue(exception.getMessage().startsWith(expectedErrorPrefix), 
+        assertTrue(exception.getMessage().startsWith(expectedErrorPrefix),
                 "Exception message should start with '" + expectedErrorPrefix + "', but was: " + exception.getMessage());
     }
     
