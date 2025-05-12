@@ -16,12 +16,12 @@ services:
       SMTP_PORT: "1025"
 
       # Airship and email configuration
-      AIRSHIP_EMAIL_SENDER: "arte-trials@test.fr"
-      AIRSHIP_ENDPOINT: "/api/create-and-send"
-      AIRSHIP_APP_KEY: ""  # Add your Airship API key here
-      AIRSHIP_ACCESS_TOKEN: ""  # Add your Airship access token here
-      AIRSHIP_HEADER: "vnd.urbanairship+json"
-      AIRSHIP_DOMAIN: "https://go.airship.eu"
+      AIRSHIP_EMAIL_SENDER: "${AIRSHIP_EMAIL_SENDER}"
+      AIRSHIP_ENDPOINT: "${AIRSHIP_ENDPOINT}"
+      AIRSHIP_APP_KEY: "${AIRSHIP_APP_KEY}"
+      AIRSHIP_ACCESS_TOKEN: "${AIRSHIP_APP_TOKEN}"
+      AIRSHIP_HEADER: "${AIRSHIP_HEADER}"
+      AIRSHIP_DOMAIN: "${AIRSHIP_DOMAIN}"
 
     command:
       - "start-dev"
@@ -53,8 +53,8 @@ services:
     networks:
       - keycloak-airship-provider
     ports:
-      - 1080:1080
-      - 1025:1025
+      - "1080:1080"
+      - "1025:1025"
 
 volumes:
   postgres_data:
