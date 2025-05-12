@@ -1,6 +1,7 @@
 services:
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.6
+    container_name: keycloak-airship
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: password
@@ -26,6 +27,8 @@ services:
       - "start-dev"
     ports:
       - "8080:8080"
+    volumes:
+      - ./target/airship-provider-0.0.1-SNAPSHOT.jar:/opt/keycloak/providers/airship-provider-0.0.1-SNAPSHOT.jar:z
     depends_on:
       - keycloak-db
     networks:
@@ -38,15 +41,25 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - x_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
 
+  smtp:
+    image: maildev/maildev:2.0.0-beta3
+    container_name: smtp
+    networks:
+      - keycloak-airship-provider
+    ports:
+      - 1080:1080
+      - 1025:1025
+
 volumes:
-  x_postgres_data:
+  postgres_data:
     driver: local
 
 networks:
   keycloak-airship-provider:
+    name: keycloak-airship-provider
