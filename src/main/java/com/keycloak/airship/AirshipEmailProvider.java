@@ -1,6 +1,7 @@
 package com.keycloak.airship;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
@@ -40,40 +41,94 @@ public class AirshipEmailProvider implements EmailSenderProvider {
     @Override
     public void send(Map<String, String> config, String address, String subject, String textBody, String htmlBody) throws EmailException {
         try {
+            // Create the payload according to Airship API format
             ObjectNode payload = objectMapper.createObjectNode();
             ObjectNode audience = objectMapper.createObjectNode();
+            ObjectNode recipient = objectMapper.createObjectNode();
+            ArrayNode createAndSend = objectMapper.createArrayNode();
 
-            audience.put("email", address);
+            recipient.put("ua_address", address);
+            createAndSend.add(recipient);
+            audience.set("create_and_send", createAndSend);
             payload.set("audience", audience);
 
-            ObjectNode sender = objectMapper.createObjectNode();
-            sender.put("email_address", config.getOrDefault("from", defaultSender));
-            payload.set("sender", sender);
+            // Set device_types to email
+            ArrayNode deviceTypes = objectMapper.createArrayNode();
+            deviceTypes.add("email");
+            payload.set("device_types", deviceTypes);
 
-            payload.put("subject", subject);
-            payload.put("plain", textBody);
-            payload.put("html", htmlBody);
+            // Create notification content
+            ObjectNode notification = objectMapper.createObjectNode();
+            ObjectNode email = objectMapper.createObjectNode();
 
+            email.put("subject", subject);
+            email.put("message_type", "transactional");
+
+            // Set sender information
+            String senderName = config.getOrDefault("senderName", "Keycloak");
+
+            // Ensure valid sender email
+            String senderEmail = defaultSender;
+            if (config.containsKey("from") && config.get("from") != null && !config.get("from").isEmpty()) {
+                senderEmail = config.get("from");
+            }
+            if (senderEmail == null || senderEmail.isEmpty()) {
+                senderEmail = "no-reply@example.com";
+                logger.warn("No sender email found, using default: {}", senderEmail);
+            }
+
+            // Ensure valid reply-to address
+            String replyTo = senderEmail; // Default to sender email
+            if (config.containsKey("replyTo") && config.get("replyTo") != null && !config.get("replyTo").isEmpty()) {
+                replyTo = config.get("replyTo");
+            }
+
+            email.put("sender_name", senderName);
+            email.put("sender_address", senderEmail);
+            email.put("reply_to", replyTo);
+
+            // Set email content
+            if (htmlBody != null && !htmlBody.isEmpty()) {
+                email.put("html_body", htmlBody);
+            }
+
+            if (textBody != null && !textBody.isEmpty()) {
+                email.put("plaintext_body", textBody);
+            }
+
+            notification.set("email", email);
+            payload.set("notification", notification);
+
+            // Convert to JSON and send
             String json = objectMapper.writeValueAsString(payload);
+            logger.debug("Request payload: {}", json);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(airShipDomain + apiUrl))
-                    .header("Authorization", "Bearer " + accessToken)
-                    //.header("X-UA-Appkey", appKey)
-                    .header("Accept", "application/" + airshipHeader + "; version=3;")
+            String fullUrl = airShipDomain + apiUrl;
+            logger.info("Sending HTTP request to {}", fullUrl);
+
+            // Build request with proper headers
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                    .uri(URI.create(fullUrl))
                     .header("Content-Type", "application/json")
+                    .header("Accept", "application/" + airshipHeader + "; version=3")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("X-UA-App-Key", appKey);
+
+            // Finalize and send the request
+            HttpRequest request = requestBuilder
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() >= 400) {
-                logger.error("Failed to send email. Response code: {}, body: {}", response.statusCode(), json);
+                logger.error("Failed to send email. Response code: {}, body: {}", response.statusCode(), response.body());
                 throw new EmailException("Airship API responded with error: " + response.statusCode() + " - " + response.body());
             }
 
-            logger.info("Airship Email sent successfully.");
+            logger.info("Airship Email sent successfully to {}. Status code: {}", address, response.statusCode());
         } catch (Exception e) {
+            logger.error("Failed to send email via Airship", e);
             throw new EmailException("Failed to send email via Airship", e);
         }
     }
