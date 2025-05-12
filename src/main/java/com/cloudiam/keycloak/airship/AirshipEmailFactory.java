@@ -1,17 +1,16 @@
 package com.cloudiam.keycloak.airship;
 
+import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.email.EmailSenderProvider;
 import org.keycloak.email.EmailSenderProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
-    public static final String PROVIDER_ID = "default";
-    private final Logger logger = LoggerFactory.getLogger(AirshipEmailFactory.class);
+    public static final String PROVIDER_ID = "keycloak-airship-provider";
+    private static final Logger LOGGER = Logger.getLogger(AirshipEmailFactory.class);
     private String apiEndpoint;
     private String airShipDomain;
     private String accessToken;
@@ -21,7 +20,7 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
     @Override
     public void init(Config.Scope config) {
-        logger.info("******** INITIALIZING AIRSHIP EMAIL SENDER PROVIDER ********");
+        LOGGER.info("******** INITIALIZING AIRSHIP EMAIL SENDER PROVIDER ********");
 
         this.apiEndpoint = System.getenv("AIRSHIP_ENDPOINT");
         this.accessToken = System.getenv("AIRSHIP_ACCESS_TOKEN");
@@ -31,19 +30,19 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
         this.airShipDomain = System.getenv("AIRSHIP_DOMAIN").isEmpty() ? "https://go.airship.eu" : System.getenv("AIRSHIP_DOMAIN");
 
         // Log configuration
-        logger.info("Airship Email Configuration:");
-        logger.info("API URL: {}", this.apiEndpoint);
-        logger.info("Domain: {}", airShipDomain);
-        logger.info( accessToken != null ? "Access Token: [CONFIGURED]" : "Access Token: [MISSING]");
-        logger.info(appKey != null ? "App Key: [CONFIGURED]" : "App Key: [MISSING]");
-        logger.info("Default Sender: {}", defaultSender);
-        logger.info(airshipHeader != null ? "Header: [CONFIGURED]" : "Header: [MISSING]");
+        LOGGER.info("Airship Email Configuration:");
+        LOGGER.infof("API URL: %s", this.apiEndpoint);
+        LOGGER.infof("Domain: %s", airShipDomain);
+        LOGGER.info(accessToken != null ? "Access Token: [CONFIGURED]" : "Access Token: [MISSING]");
+        LOGGER.info(appKey != null ? "App Key: [CONFIGURED]" : "App Key: [MISSING]");
+        LOGGER.infof("Default Sender: %s", defaultSender);
+        LOGGER.info(airshipHeader != null ? "Header: [CONFIGURED]" : "Header: [MISSING]");
 
         if (apiEndpoint == null || accessToken == null || appKey == null || defaultSender == null) {
             throw new IllegalStateException("Missing required Airship environment variables.");
         }
 
-        logger.info("******** AIRSHIP EMAIL SENDER PROVIDER INITIALIZING SUCCESSFULLY ********");
+        LOGGER.info("******** AIRSHIP EMAIL SENDER PROVIDER INITIALIZING SUCCESSFULLY ********");
     }
 
     @Override
@@ -57,7 +56,7 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
     @Override
     public void close() {
-        logger.info("******** CLOSING AIRSHIP EMAIL SENDER PROVIDER ********");
+        LOGGER.info("******** CLOSING AIRSHIP EMAIL SENDER PROVIDER ********");
     }
 
     @Override
