@@ -47,7 +47,7 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
     @Override
     public EmailSenderProvider create(KeycloakSession session) {
-        return new AirshipEmailProvider(apiEndpoint, airShipDomain, accessToken, appKey, defaultSender, airshipHeader);
+        return new AirshipEmailProvider(session, apiEndpoint, airShipDomain, accessToken, appKey, defaultSender, airshipHeader);
     }
 
     @Override
