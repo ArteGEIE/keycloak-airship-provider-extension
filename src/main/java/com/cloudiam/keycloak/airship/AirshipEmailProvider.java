@@ -3,8 +3,11 @@ package com.cloudiam.keycloak.airship;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.jboss.logging.Logger;
+import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
+import org.keycloak.models.KeycloakSession;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,7 +18,7 @@ import java.util.Map;
 
 public class AirshipEmailProvider implements EmailSenderProvider {
 
-    private Logger logger = LoggerFactory.getLogger(AirshipEmailProvider.class);
+    private static final Logger LOGGER = Logger.getLogger(AirshipEmailFactory.class);
     private final String apiUrl;
     private final String airShipDomain;
     private final String accessToken;
@@ -23,23 +26,21 @@ public class AirshipEmailProvider implements EmailSenderProvider {
     private final String defaultSender;
     private final String airshipHeader;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final HttpClient httpClient;
+    private final KeycloakSession session;
 
-    public AirshipEmailProvider(String apiUrl, String airShipDomain, String accessToken, String appKey, String defaultSender, String airshipHeader) {
+    public AirshipEmailProvider(KeycloakSession session, String apiUrl, String airShipDomain, String accessToken, String appKey, String defaultSender, String airshipHeader) {
         this.apiUrl = apiUrl;
         this.airShipDomain = airShipDomain;
         this.accessToken = accessToken;
         this.appKey = appKey;
         this.defaultSender = defaultSender;
         this.airshipHeader = airshipHeader;
-        this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
-                .build();
+        this.session = session;
     }
     @Override
     public void send(Map<String, String> config, String address, String subject, String textBody, String htmlBody) throws EmailException {
         try {
-            logger.info("******** START AIRSHIP EMAIL SENDING ********");
+            LOGGER.info("******** START AIRSHIP EMAIL SENDING ********");
 
             // Create the payload according to Airship API format
             ObjectNode payload = objectMapper.createObjectNode();
@@ -74,7 +75,7 @@ public class AirshipEmailProvider implements EmailSenderProvider {
             }
             if (senderEmail == null || senderEmail.isEmpty()) {
                 senderEmail = "no-reply@example.com";
-                logger.warn("No sender email found, using default: {}", senderEmail);
+                LOGGER.warnf("No sender email found, using default: %s", senderEmail);
             }
 
             // Ensure valid reply-to address
@@ -101,40 +102,36 @@ public class AirshipEmailProvider implements EmailSenderProvider {
 
             // Convert to JSON and send
             String json = objectMapper.writeValueAsString(payload);
-            logger.debug("Request payload: {}", json);
+            LOGGER.tracef("Request payload: %s", json);
 
             String fullUrl = airShipDomain + apiUrl;
-            logger.info("Sending HTTP request to {}", fullUrl);
+            LOGGER.debugf("Sending HTTP request to %s", fullUrl);
 
             // Build request with proper headers
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                    .uri(URI.create(fullUrl))
+            SimpleHttp simpleHttp = SimpleHttp.doPost(fullUrl, session)
                     .header("Content-Type", "application/json")
                     .header("Accept", "application/" + airshipHeader + "; version=3")
                     .header("Authorization", "Bearer " + accessToken)
-                    .header("X-UA-App-Key", appKey);
+                    .header("X-UA-App-Key", appKey)
+                    .json(payload);
 
-            // Finalize and send the request
-            HttpRequest request = requestBuilder
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+            SimpleHttp.Response response = simpleHttp.asResponse();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() >= 400) {
-                logger.error("Failed to send email. Response code: {}, body: {}", response.statusCode(), response.body());
-                throw new EmailException("Airship API responded with error: " + response.statusCode() + " - " + response.body());
+            if (response.getStatus() >= 400) {
+                LOGGER.errorf("Failed to send email. Response code: %s, body: %s", response.getStatus(), response.asString());
+                throw new EmailException("Airship API responded with error: " + response.getStatus() + " - " + response.asString());
             }
 
-            logger.info("******** AIRSHIP EMAIL SENT SUCCESSFULLY to {}. ********", address);
+            LOGGER.debugf("******** AIRSHIP EMAIL SENT SUCCESSFULLY to %s. ********", address);
         } catch (Exception e) {
-            logger.error("Failed to send email via Airship", e);
+            LOGGER.error("Failed to send email via Airship", e);
             throw new EmailException("Failed to send email via Airship", e);
         }
     }
 
     @Override
     public void close() {
-
+        // Do nothing
     }
 }

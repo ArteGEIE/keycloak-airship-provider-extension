@@ -28,7 +28,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./target/airship-provider-0.0.1-SNAPSHOT.jar:/opt/keycloak/providers/airship-provider-0.0.1-SNAPSHOT.jar:z
+      - ./target/airship-provider-1.0.0-SNAPSHOT.jar:/opt/keycloak/providers/airship-provider.jar:z
     depends_on:
       - keycloak-db
     networks:

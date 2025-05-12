@@ -45,6 +45,7 @@ class AirshipEmailProviderTest {
         String TEST_DEFAULT_SENDER = "test@sender.com";
         String TEST_ACCESS_TOKEN = "test-access-token";
         provider = new AirshipEmailProvider(
+                mockSession,
                 TEST_API_URL,
                 TEST_AIRSHIP_DOMAIN,
                 TEST_ACCESS_TOKEN,
