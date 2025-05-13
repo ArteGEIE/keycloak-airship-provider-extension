@@ -69,22 +69,12 @@ public class AirshipEmailProvider implements EmailSenderProvider {
 
             // Ensure valid sender email
             String senderEmail = defaultSender;
-            if (config.containsKey("from") && config.get("from") != null && !config.get("from").isEmpty()) {
-                senderEmail = config.get("from");
-            }
-            if (senderEmail == null || senderEmail.isEmpty()) {
-                senderEmail = "no-reply@example.com";
-                LOGGER.warnf("No sender email found, using default: %s", senderEmail);
-            }
-
-            String replyTo = senderEmail; // Default to sender email
-            if (config.containsKey("replyTo") && config.get("replyTo") != null && !config.get("replyTo").isEmpty()) {
-                replyTo = config.get("replyTo");
-            }
+            config.getOrDefault("from", senderEmail);
+            config.getOrDefault("replyTo", senderEmail);
 
             email.put("sender_name", senderName);
             email.put("sender_address", senderEmail);
-            email.put("reply_to", replyTo);
+            email.put("reply_to", senderEmail);
 
             // Set email content
             if (htmlBody != null && !htmlBody.isEmpty()) {
