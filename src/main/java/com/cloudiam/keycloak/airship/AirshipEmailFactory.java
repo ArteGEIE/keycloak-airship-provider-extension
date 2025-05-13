@@ -64,7 +64,7 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
         return PROVIDER_ID;
     }
 
-    // Make sure it ovverides default email provider
+    // Make sure it overrides default email provider
     @Override
     public int order() {
         return 100;

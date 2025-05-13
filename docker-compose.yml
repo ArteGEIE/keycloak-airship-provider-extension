@@ -12,8 +12,6 @@ services:
       KC_FEATURES: preview,scripts
       KC_LOG_FORMAT: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"
       KC_LOG_LEVEL: "INFO,org.hibernate:INFO,com.cloudiam:DEBUG,org.keycloak.authentication:DEBUG"
-      SMTP_HOST: "smtp"
-      SMTP_PORT: "1025"
 
       # Airship and email configuration
       AIRSHIP_EMAIL_SENDER: "${AIRSHIP_EMAIL_SENDER}"
@@ -46,15 +44,6 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-
-  smtp:
-    image: maildev/maildev:2.0.0-beta3
-    container_name: smtp
-    networks:
-      - keycloak-airship-provider
-    ports:
-      - "1080:1080"
-      - "1025:1025"
 
 volumes:
   postgres_data:
