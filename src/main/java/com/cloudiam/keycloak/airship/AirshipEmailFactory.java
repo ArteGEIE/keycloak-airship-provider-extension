@@ -63,4 +63,10 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
     public String getId() {
         return PROVIDER_ID;
     }
+
+    // Make sure it ovverides default email provider
+    @Override
+    public int order() {
+        return 100;
+    }
 }
