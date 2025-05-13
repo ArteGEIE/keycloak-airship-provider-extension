@@ -23,7 +23,7 @@ The extension uses the following environment variables:
 
 1. Build the extension with Maven:
    ```
-   mvn clean package
+   mvn clean package -DskipTests
    ```
 
 2. Copy the resulting JAR file to Keycloak's `providers` directory:
@@ -40,7 +40,7 @@ The extension uses the following environment variables:
 ## Features
 
 - Sends all Keycloak emails through Airship's API
-- Uses Airship's "Create and Send" endpoint to efficiently create email channels and send transactional emails
+- Uses Airship's "Send" endpoint to send transactional emails
 - Configurable sender information
 - Adds "keycloak" category tag to all emails for easy filtering in Airship
 
@@ -54,7 +54,13 @@ The extension uses the following environment variables:
 ### Building from Source
 
 ```
-mvn clean package
+   mvn clean package -DskipTests
+```
+
+### Tests
+
+```
+mvn clean test
 ```
 
 ## References

@@ -57,6 +57,10 @@ public class AirshipEmailProvider implements EmailSenderProvider {
             ObjectNode notification = objectMapper.createObjectNode();
             ObjectNode email = objectMapper.createObjectNode();
 
+            // Create categories node
+            ArrayNode categories = objectMapper.createArrayNode();
+            categories.add("keycloak");
+
             email.put("subject", subject);
             email.put("message_type", "transactional");
 
@@ -73,7 +77,6 @@ public class AirshipEmailProvider implements EmailSenderProvider {
                 LOGGER.warnf("No sender email found, using default: %s", senderEmail);
             }
 
-            // Ensure valid reply-to address
             String replyTo = senderEmail; // Default to sender email
             if (config.containsKey("replyTo") && config.get("replyTo") != null && !config.get("replyTo").isEmpty()) {
                 replyTo = config.get("replyTo");
@@ -94,6 +97,11 @@ public class AirshipEmailProvider implements EmailSenderProvider {
 
             notification.set("email", email);
             payload.set("notification", notification);
+
+            // Create campaigns node and add categories
+            ObjectNode campaigns = objectMapper.createObjectNode();
+            campaigns.set("categories", categories);
+            payload.set("campaigns", campaigns);
 
             // Convert to JSON and send
             String json = objectMapper.writeValueAsString(payload);

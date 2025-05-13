@@ -25,10 +25,6 @@ public class AirshipEmailFactoryTests {
 
     private static WireMockContainer wiremockServer;
     private KeycloakSession keycloakSession;
-    private AirshipEmailProvider airshipEmailProvider;
-    private EmailSenderProvider provider;
-    private RealmModel realm;
-    private UserModel user;
 
     @BeforeAll
     public static void startWireMockServer() {
@@ -46,17 +42,16 @@ public class AirshipEmailFactoryTests {
         keycloakSession = mock(KeycloakSession.class);
         
         RealmProvider realmProvider = mock(RealmProvider.class);
-        realm = mock(RealmModel.class);
+        RealmModel realm = mock(RealmModel.class);
         when(keycloakSession.realms()).thenReturn(realmProvider);
         when(realmProvider.getRealm(any(String.class))).thenReturn(realm);
     
         UserProvider userProvider = mock(UserProvider.class);
-        user = mock(UserModel.class);
+        UserModel user = mock(UserModel.class);
         when(keycloakSession.users()).thenReturn(userProvider);
         when(userProvider.getUserByUsername(any(RealmModel.class), any(String.class))).thenReturn(user);
-        
-        airshipEmailProvider = new AirshipEmailProvider(keycloakSession, "http://api.example.com", "example.com", "accessToken", "appKey", "defaultSender@example.com", "airshipHeader");
-        provider = airshipEmailProvider;
+
+        EmailSenderProvider provider = new AirshipEmailProvider(keycloakSession, "http://api.example.com", "example.com", "accessToken", "appKey", "defaultSender@example.com", "airshipHeader");
     }
 
     @AfterEach
