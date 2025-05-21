@@ -26,8 +26,8 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
         this.accessToken = System.getenv("AIRSHIP_ACCESS_TOKEN");
         this.appKey = System.getenv("AIRSHIP_APP_KEY");
         this.defaultSender = System.getenv("AIRSHIP_EMAIL_SENDER");
-        this.airshipHeader = System.getenv("AIRSHIP_HEADER").isEmpty() ? "vnd.urbanairship+json" : System.getenv("AIRSHIP_HEADER");
-        this.airShipDomain = System.getenv("AIRSHIP_DOMAIN").isEmpty() ? "https://go.airship.eu" : System.getenv("AIRSHIP_DOMAIN");
+        this.airshipHeader = System.getenv().getOrDefault("AIRSHIP_HEADER", "vnd.urbanairship+json");
+        this.airShipDomain = System.getenv().getOrDefault("AIRSHIP_DOMAIN", "https://go.airship.eu");
 
         // Log configuration
         LOGGER.info("Airship Email Configuration:");
@@ -56,7 +56,7 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
 
     @Override
     public void close() {
-        LOGGER.info("******** CLOSING AIRSHIP EMAIL SENDER PROVIDER ********");
+        LOGGER.debug("******** CLOSING AIRSHIP EMAIL SENDER PROVIDER ********");
     }
 
     @Override
