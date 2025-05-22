@@ -3,7 +3,6 @@
 *.iws
 *.iml
 *.ipr
-.mvn
 
 target
 !.mvn/wrapper/maven-wrapper.jar
