@@ -20,13 +20,16 @@ services:
       AIRSHIP_ACCESS_TOKEN: "${AIRSHIP_APP_TOKEN}"
       AIRSHIP_HEADER: "${AIRSHIP_HEADER}"
       AIRSHIP_DOMAIN: "${AIRSHIP_DOMAIN}"
+      AIRSHIP_EMAIL_SENDER_NAME: "${AIRSHIP_EMAIL_SENDER_NAME}"
+      AIRSHIP_EMAIL_REPLY_TO: "${AIRSHIP_EMAIL_REPLY_TO}"
+      KEYCLOAK_EMAIL_PROVIDER_PRIORITY: "${KEYCLOAK_EMAIL_PROVIDER_PRIORITY}"
 
     command:
       - "start-dev"
     ports:
       - "8080:8080"
     volumes:
-      - ./target/airship-provider-1.0.0-SNAPSHOT.jar:/opt/keycloak/providers/airship-provider.jar:z
+      - ./target/airship-provider-1.0.0-SNAPSHOT.jar:/opt/keycloak/providers/airship-provider-1.0.0.jar:z
     depends_on:
       - keycloak-db
     networks:
