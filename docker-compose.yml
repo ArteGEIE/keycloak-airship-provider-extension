@@ -12,8 +12,9 @@ services:
       KC_FEATURES: preview,scripts
       KC_LOG_FORMAT: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"
       KC_LOG_LEVEL: "INFO,org.hibernate:INFO,com.cloudiam:DEBUG,org.keycloak.authentication:DEBUG"
+      # To disable the Airship provider, set this to 'default'
       KC_SPI_EMAIL_SENDER_PROVIDER: ${KC_SPI_EMAIL_SENDER_PROVIDER}
-      
+
       # Airship and email configuration
       AIRSHIP_EMAIL_SENDER: "${AIRSHIP_EMAIL_SENDER}"
       AIRSHIP_ENDPOINT: "${AIRSHIP_ENDPOINT}"
@@ -49,7 +50,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
 
-  mailhog:
+  smtp:
     image: mailhog/mailhog:latest
     networks:
       - keycloak-airship-provider
