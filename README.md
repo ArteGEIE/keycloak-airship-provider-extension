@@ -4,7 +4,7 @@ This extension allows Keycloak to send emails using the Airship email service. I
 
 In the realm settings, from, sender name, reply to and reply to name will be used as default values.
 
-**Important:** If you need to disable the Airship provider, use the highest priority id 'default', see https://www.keycloak.org/server/configuration-provider#_configuring_a_default_provider_for_an_spi
+**Important:** If you need to disable the Airship provider, use the email sender provider environment variable `KC_SPI_EMAIL_SENDER_PROVIDER` with value `default`, see https://www.keycloak.org/server/configuration-provider#_configuring_a_default_provider_for_an_spi
 
 ## Overview
 

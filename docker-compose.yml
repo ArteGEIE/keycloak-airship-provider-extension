@@ -12,7 +12,8 @@ services:
       KC_FEATURES: preview,scripts
       KC_LOG_FORMAT: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"
       KC_LOG_LEVEL: "INFO,org.hibernate:INFO,com.cloudiam:DEBUG,org.keycloak.authentication:DEBUG"
-
+      KC_SPI_EMAIL_SENDER_PROVIDER: ${KC_SPI_EMAIL_SENDER_PROVIDER}
+      
       # Airship and email configuration
       AIRSHIP_EMAIL_SENDER: "${AIRSHIP_EMAIL_SENDER}"
       AIRSHIP_ENDPOINT: "${AIRSHIP_ENDPOINT}"
@@ -24,6 +25,7 @@ services:
       AIRSHIP_EMAIL_REPLY_TO: "${AIRSHIP_EMAIL_REPLY_TO}"
 
     command:
+      - "--verbose"
       - "start-dev"
     ports:
       - "8080:8080"
@@ -46,6 +48,14 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    networks:
+      - keycloak-airship-provider
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
 volumes:
   postgres_data:
