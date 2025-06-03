@@ -1,6 +1,8 @@
 # Keycloak Airship Provider Extension
 
-This extension allows Keycloak to send emails using the Airship email service. It will automatically take precedence over the default SMTP provider due to its higher priority. No manual configuration is required in the realm settings.
+This extension allows Keycloak to send emails using the Airship email service. It will automatically take precedence over the default SMTP provider due to its higher priority. 
+
+In the realm settings, from, sender name, reply to and reply to name will be used as default values.
 
 **Important:** If you need to disable the Airship provider and use the default SMTP provider, set the environment variable `KEYCLOAK_EMAIL_PROVIDER_PRIORITY` to a value lower than 100.
 
