@@ -26,6 +26,8 @@ class AirshipEmailProviderTests {
     private static final String TEST_ACCESS_TOKEN = "test-token";
     private static final String TEST_APP_KEY = "test-app-key";
     private static final String TEST_DEFAULT_SENDER = "noreply@example.com";
+    private static final String TEST_DEFAULT_SENDER_NAME = "John Doe";
+    private static final String TEST_DEFAULT_REPLY_TO = "John Doe <noreply@example.com>";
     private static final String TEST_AIRSHIP_HEADER = "vnd.urbanairship+json";
     public static final String USER_EMAIL = "user@example.com";
 
@@ -59,9 +61,9 @@ class AirshipEmailProviderTests {
                 .withRequestBody(matchingJsonPath("$.notification.email.subject", equalTo("Verify email")))
                 .withRequestBody(matchingJsonPath("$.notification.email.html_body", isNotNull()))
                 .withRequestBody(matchingJsonPath("$.notification.email.plaintext_body", isNotNull()))
-                .withRequestBody(matchingJsonPath("$.notification.email.sender_name", equalTo("Keycloak")))
+                .withRequestBody(matchingJsonPath("$.notification.email.sender_name", equalTo(TEST_DEFAULT_SENDER_NAME)))
                 .withRequestBody(matchingJsonPath("$.notification.email.sender_address", equalTo(TEST_DEFAULT_SENDER)))
-                .withRequestBody(matchingJsonPath("$.notification.email.reply_to", equalTo(TEST_DEFAULT_SENDER)))
+                .withRequestBody(matchingJsonPath("$.notification.email.reply_to", equalTo(TEST_DEFAULT_REPLY_TO)))
                 .withRequestBody(matchingJsonPath("$.campaigns.categories[0]", equalTo("keycloak")))
         );
 
@@ -99,6 +101,9 @@ class AirshipEmailProviderTests {
                 .withEnv("AIRSHIP_APP_KEY", TEST_APP_KEY)
                 .withEnv("AIRSHIP_EMAIL_SENDER", TEST_DEFAULT_SENDER)
                 .withEnv("AIRSHIP_DOMAIN", "http://wiremock:8080")
+                .withEnv("AIRSHIP_EMAIL_SENDER", TEST_DEFAULT_SENDER)
+                .withEnv("AIRSHIP_EMAIL_SENDER_NAME", TEST_DEFAULT_SENDER_NAME)
+                .withEnv("AIRSHIP_EMAIL_REPLY_TO", TEST_DEFAULT_REPLY_TO)
                 .withDefaultProviderClasses();
         LOGGER.info("Keycloak container created");
         return container;

@@ -18,20 +18,26 @@ public class AirshipEmailProvider implements EmailSenderProvider {
     private final String airShipDomain;
     private final String accessToken;
     private final String appKey;
-    private final String defaultSender;
+    private final String senderEmail;
+    private final String senderName;
+    private final String replyTo;
     private final String airshipHeader;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final KeycloakSession session;
 
-    public AirshipEmailProvider(KeycloakSession session, String apiUrl, String airShipDomain, String accessToken, String appKey, String defaultSender, String airshipHeader) {
+    public AirshipEmailProvider(KeycloakSession session, String apiUrl, String airShipDomain, String accessToken, String appKey, String airshipHeader, String senderEmail, String senderName, String replyTo) {
         this.apiUrl = apiUrl;
         this.airShipDomain = airShipDomain;
         this.accessToken = accessToken;
         this.appKey = appKey;
-        this.defaultSender = defaultSender;
         this.airshipHeader = airshipHeader;
         this.session = session;
+        this.senderEmail = senderEmail;
+        this.senderName = senderName;
+        this.replyTo = replyTo;
     }
+
     @Override
     public void send(Map<String, String> config, String address, String subject, String textBody, String htmlBody) throws EmailException {
         try {
@@ -61,20 +67,19 @@ public class AirshipEmailProvider implements EmailSenderProvider {
             ArrayNode categories = objectMapper.createArrayNode();
             categories.add("keycloak");
 
-            email.put("subject", subject);
-            email.put("message_type", "transactional");
-
-            // Set sender information
-            String senderName = config.getOrDefault("senderName", "Keycloak");
-
-            // Ensure valid sender email
-            String senderEmail = defaultSender;
-            config.getOrDefault("from", senderEmail);
-            config.getOrDefault("replyTo", senderEmail);
-
             email.put("sender_name", senderName);
             email.put("sender_address", senderEmail);
-            email.put("reply_to", senderEmail);
+            email.put("reply_to", replyTo);
+            email.put("subject", subject);
+            email.put("message_type", "transactional");
+            email.put("bypass_opt_in_level", true);
+            email.put("click_tracking", false);
+            email.put("open_tracking", false);
+
+            // Set email configuration
+            email.put("sender_name", senderName);
+            email.put("sender_address", senderEmail);
+            email.put("reply_to", replyTo);
 
             // Set email content
             if (htmlBody != null && !htmlBody.isEmpty()) {
@@ -116,7 +121,7 @@ public class AirshipEmailProvider implements EmailSenderProvider {
                 throw new EmailException("Airship API responded with error: " + response.getStatus() + " - " + response.asString());
             }
 
-            LOGGER.debugf("******** AIRSHIP EMAIL SENT SUCCESSFULLY to %s. ********", address);
+            LOGGER.info("******** AIRSHIP EMAIL SENT SUCCESSFULLY to " + address);
         } catch (Exception e) {
             LOGGER.error("Failed to send email via Airship", e);
             throw new EmailException("Failed to send email via Airship", e);
