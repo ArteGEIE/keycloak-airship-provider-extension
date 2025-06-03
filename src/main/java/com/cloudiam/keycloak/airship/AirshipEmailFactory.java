@@ -79,7 +79,7 @@ public class AirshipEmailFactory implements EmailSenderProviderFactory {
     // Make sure it overrides default email provider
     @Override
     public int order() {
-        return Integer.parseInt(getEnvOrDefault("KEYCLOAK_EMAIL_PROVIDER_PRIORITY", "100"));
+        return 100;
     }
 
     private String getFromEmail(KeycloakSession session) {
