@@ -23,6 +23,13 @@
         <testcontainers-keycloak.version>3.6.0</testcontainers-keycloak.version>
         <rest-assured.version>5.5.1</rest-assured.version>
     </properties>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/artegeie/keycloak-airship-provider-extension</url>
+        </repository>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <!--        used for test container logback-->
