@@ -13,7 +13,7 @@
         <revision>1.0.${buildnumber}</revision>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <keycloak.version>25.0.6</keycloak.version>
+        <keycloak.version>26.3.3</keycloak.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <mockito.version>5.16.0</mockito.version>
         <junit-jupiter.version>5.12.0</junit-jupiter.version>
