@@ -1,7 +1,9 @@
 name: Publish package to GitHub Packages
+
 on:
   release:
     types: [created]
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -10,10 +12,44 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup xmllint
+        uses: Bpolitycki/setup-xmllint-action@1.0.1
+
+      - name: Detect java version
+        id: java-version
+        run: |
+          [[ ! -f pom.xml ]] && { echo "No pom.xml found!" >&2; exit 1; }
+
+          # Read and normalize POM (remove xmlns to simplify XPath queries)
+          POM=$(xmllint --recover --format pom.xml \
+            | sed 's/xmlns="[^"]*"//')
+
+          # Try to get Java version from maven-compiler-plugin
+          VERSION=$(echo "$POM" \
+            | xmllint --xpath "string(//plugin[artifactId='maven-compiler-plugin']/configuration/source)" - 2>/dev/null)
+
+          # Fallback: use <maven.compiler.source> from <properties>
+          if [[ -z "$VERSION" ]]; then
+            VERSION=$(echo "$POM" \
+              | xmllint --xpath "string(//properties/maven.compiler.source)" - 2>/dev/null \
+              | sed 's/[^0-9]//g')
+          fi
+
+          if [[ "$VERSION" == "" ]]; then
+            echo "::warning::No Java version found in pom.xml, using fallback"
+            VERSION="21"
+          fi
+
+          echo "::notice::Detected Java version: $VERSION"
+
+          echo "java_version=$VERSION" >> $GITHUB_OUTPUT
+
       - uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: ${{ steps.java-version.outputs.java_version }}
           distribution: 'temurin'
+
       - name: Publish package
         run: mvn --batch-mode deploy -Drevision=${{ github.event.release.tag_name }}
         env:
