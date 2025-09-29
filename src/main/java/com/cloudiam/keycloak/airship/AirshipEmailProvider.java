@@ -129,6 +129,11 @@ public class AirshipEmailProvider implements EmailSenderProvider {
     }
 
     @Override
+    public void validate(Map<String, String> config) throws EmailException {
+        // Do nothing
+    }
+
+    @Override
     public void close() {
         // Do nothing
     }
