@@ -2,7 +2,7 @@ name: Publish package to GitHub Packages
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   publish:
@@ -54,3 +54,17 @@ jobs:
         run: mvn --batch-mode deploy -Drevision=${{ github.event.release.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔑 Generate a token
+        uses: actions/create-github-app-token@v1
+        id: generate_token
+        with:
+          app-id: ${{ secrets.SHARED_WORKFLOW_GITHUB_APP_ID }}
+          private-key: ${{ secrets.SHARED_WORKFLOW_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Trigger Keycloak Configuration Repo
+        run: |
+          gh workflow run update-plugin.yml --repo ArteGEIE/keycloak-configuration --ref main -f "version=${{ github.event.release.tag_name }}" -f "plugin=${{ github.repository }}"
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
