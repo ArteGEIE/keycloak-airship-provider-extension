@@ -3,6 +3,12 @@ name: Publish package to GitHub Packages
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release Tag'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
   publish:
@@ -11,7 +17,18 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Get Release Tag
+        id: get_tag
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "release_tag=${{ github.event.release.tag_name }}"   >> $GITHUB_OUTPUT
+          else
+            echo "release_tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.get_tag.outputs.release_tag }}
 
       - name: Setup xmllint
         uses: Bpolitycki/setup-xmllint-action@1.0.1
@@ -51,7 +68,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Publish package
-        run: mvn --batch-mode deploy -Drevision=${{ github.event.release.tag_name }}
+        run: mvn --batch-mode deploy -Drevision=${{ steps.get_tag.outputs.release_tag }} -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,6 +82,6 @@ jobs:
 
       - name: Trigger Keycloak Configuration Repo
         run: |
-          gh workflow run update-plugin.yml --repo ArteGEIE/keycloak-configuration --ref main -f "version=${{ github.event.release.tag_name }}" -f "plugin=${{ github.repository }}"
+          gh workflow run update-plugin.yml --repo ArteGEIE/keycloak-configuration --ref main -f "version=${{ steps.get_tag.outputs.release_tag }}" -f "plugin=${{ github.repository }}"
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
