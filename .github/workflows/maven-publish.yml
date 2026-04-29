@@ -73,10 +73,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔑 Generate a token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         id: generate_token
         with:
-          app-id: ${{ secrets.KEYCLOAK_WORKFLOW_TRIGGER_APP_ID }}
+          client-id: ${{ secrets.KEYCLOAK_WORKFLOW_TRIGGER_APP_ID }}
           private-key: ${{ secrets.KEYCLOAK_WORKFLOW_TRIGGER_APP_SECRET }}
           owner: ${{ github.repository_owner }}
 
