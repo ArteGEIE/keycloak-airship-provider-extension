@@ -26,9 +26,10 @@ jobs:
             echo "release_tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ steps.get_tag.outputs.release_tag }}
+          filter: blob:none
 
       - name: Setup xmllint
         uses: Bpolitycki/setup-xmllint-action@1.0.1
@@ -62,7 +63,7 @@ jobs:
 
           echo "java_version=$VERSION" >> $GITHUB_OUTPUT
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           java-version: ${{ steps.java-version.outputs.java_version }}
           distribution: 'temurin'
@@ -73,10 +74,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔑 Generate a token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         id: generate_token
         with:
-          app-id: ${{ secrets.KEYCLOAK_WORKFLOW_TRIGGER_APP_ID }}
+          client-id: ${{ secrets.KEYCLOAK_WORKFLOW_TRIGGER_APP_ID }}
           private-key: ${{ secrets.KEYCLOAK_WORKFLOW_TRIGGER_APP_SECRET }}
           owner: ${{ github.repository_owner }}
 
