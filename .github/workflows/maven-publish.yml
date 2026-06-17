@@ -29,6 +29,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ steps.get_tag.outputs.release_tag }}
+          filter: blob:none
 
       - name: Setup xmllint
         uses: Bpolitycki/setup-xmllint-action@1.0.1
