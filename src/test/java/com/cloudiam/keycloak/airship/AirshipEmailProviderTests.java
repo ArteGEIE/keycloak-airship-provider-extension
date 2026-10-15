@@ -21,6 +21,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 class AirshipEmailProviderTests {
     private static final Logger LOGGER = getLogger(AirshipEmailProviderTests.class);
 
+    // Set by surefire from ${keycloak.version} so the test image always matches the compile-time Keycloak version
+    private static final String KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:" + System.getProperty("keycloak.version");
     private static final Network SHARED_NETWORK = Network.newNetwork();
     private static final String TEST_API_URL = "/api/email";
     private static final String TEST_ACCESS_TOKEN = "test-token";
@@ -90,7 +92,7 @@ class AirshipEmailProviderTests {
     }
 
     KeycloakContainer createKeycloakContainer(WireMockContainer wiremockServer) {
-        var container = new KeycloakContainer("quay.io/keycloak/keycloak:26.3.4")
+        var container = new KeycloakContainer(KEYCLOAK_IMAGE)
                 .withNetwork(SHARED_NETWORK)
                 .withNetworkAliases("keycloak")
                 .withEnv("KC_LOG_LEVEL", "INFO,com.cloudiam:DEBUG,org.apache.http.wire:DEBUG")
